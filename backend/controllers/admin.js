@@ -17,9 +17,13 @@ exports.signupUser = async (req, res, next) => {
       .status(201)
       .json({ message: "User created successfully", user: newUser });
   } catch (err) {
-    // Check if the error is due to duplicate email
+    // Checks if the error is due to duplicate email or duplicate phone no.
     if (err.name === "SequelizeUniqueConstraintError") {
-      return res.status(400).json({ message: "Email already exists" });
+      return res
+        .status(400)
+        .json({
+          message: "Either Email Or Phoneno already exists, Please Login",
+        });
     }
 
     console.error("Error:", err);

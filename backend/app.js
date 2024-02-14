@@ -8,7 +8,7 @@ const bodyParser = require("body-parser");
 const sequelize = require("./util/database");
 const adminRoutes = require("./routes/admin");
 
-app.use(cors());
+app.use(cors({ origin: "*" }));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
