@@ -16,11 +16,13 @@
     class="min-vh-100 min-vw-100 d-flex align-items-center justify-content-center m-0 p-0 box-sizing-border-box"
   >
     <div class="container p-0 m-0 h-100">
-      <div class="col-auto col-md-8 m-auto rounded bg-body-tertiary shadow">
+      <div
+        class="col-auto col-md-8 m-auto rounded border border-2 border-success-subtle shadow"
+      >
         <div class="text-center">
-          <img src="./assets/gc_logo.jpeg" alt="group_chat_img" />
+          <img src="./assets/logo1.jpeg" alt="group_chat_img" />
         </div>
-        <div class="card bg-body-tertiary p-4 border-0 border-top">
+        <div class="card p-4 border-0 border-top">
           <div id="msg" class="lead text-danger my-2 text-center"></div>
           <form action="#" id="my-form" class="p-2">
             <div class="mb-2">
@@ -51,6 +53,7 @@
                 type="tel"
                 id="phone"
                 name="phoneno"
+                placeholder="Enter you tel no."
                 class="form-control"
                 required
               />
@@ -68,7 +71,11 @@
             </div>
 
             <div class="d-grid gap-2 mt-3">
-              <button type="button" id="signup" class="btn btn-success">
+              <button
+                type="button"
+                id="signup"
+                class="btn bg-success-subtle fw-bold"
+              >
                 Sign Up
               </button>
             </div>

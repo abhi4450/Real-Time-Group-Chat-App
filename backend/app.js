@@ -4,6 +4,9 @@ const express = require("express");
 const app = express();
 
 const sequelize = require("./util/database");
+const userRoutes = require("./routes/users");
+
+app.use("/api", userRoutes);
 
 sequelize
   .sync()
