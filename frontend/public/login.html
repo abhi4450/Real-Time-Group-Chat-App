@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>User Signup</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <style>
+        /* Button hover effect */
+        .btn:hover {
+          background-color:  #22cfcc !important;
+          color: white; 
+        }
+      
+        /* Link hover effect */
+        .btn[href]:hover {
+          background-color: #22cfcc !important; 
+          color: white; 
+          text-decoration: none; 
+        }
+      </style>
+      
+  </head>
+  <body
+    class="min-vh-100 min-vw-100 d-flex align-items-center justify-content-center m-0 p-0 box-sizing-border-box"
+  >
+    <div class="container p-0 m-0 h-100">
+      <div
+        class="col-auto col-md-8 m-auto rounded border border-2 border-success-subtle shadow"
+      >
+        <div class="text-center">
+          <img src="./assets/logo1.jpeg" alt="group_chat_img" />
+        </div>
+        <div class="card p-4 border-0 border-top">
+          <div id="msg" class="lead text-danger my-2 text-center"></div>
+          <form action="#" id="my-form" class="p-2">
+            
+            <div class="mb-2">
+              <label for="email" class="form-label">Email</label>
+              <input
+                type="text"
+                id="email"
+                name="email"
+                placeholder="Enter your email"
+                class="form-control"
+                required
+              />
+            
+            <div class="mb-2">
+              <label for="pass" class="form-label">Password</label>
+              <input
+                type="password"
+                id="pass"
+                name="password"
+                placeholder="Enter your password"
+                class="form-control"
+                required
+              />
+            </div>
+
+            <div class="d-grid gap-2 mt-3">
+              <button
+                type="button"
+                id="login"
+                class="btn bg-success-subtle fw-bold"
+              >
+               Login
+              </button>
+              <a
+              class="btn bg-success-subtle fw-bold"
+              href="http://localhost:3000/api/home"
+              role="button"
+            >
+              New Users ? -> Signup Now</a
+            >
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script src="./signup.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+      integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
