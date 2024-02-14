@@ -19,6 +19,7 @@ async function UserLoginHandler() {
 
     if (result.success) {
       if (result.status === 200) {
+        localStorage.setItem("token", result.data.token);
         alert(result.data.message);
       } else {
         console.log("Unexpected status code:", result.status);
