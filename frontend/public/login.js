@@ -41,7 +41,7 @@ async function UserLoginHandler() {
 async function checkForUserInBackend(loginUserData) {
   try {
     const response = await axios.post(
-      "http://lcoalhost:3000/api/user/login",
+      "http://localhost:3000/api/user/login",
       loginUserData
     );
 

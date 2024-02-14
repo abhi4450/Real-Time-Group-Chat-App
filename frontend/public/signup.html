@@ -11,6 +11,28 @@
       integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
       crossorigin="anonymous"
     />
+    <style>
+      .btn {
+        cursor: pointer !important;
+        transition: background-color 0.3s ease-in-out !important;
+      }
+      /* Button hover effect */
+      .btn:hover {
+        background-color: #22cfcc !important;
+        color: white;
+      }
+
+      /* Link hover effect */
+      .btn[href]:hover {
+        background-color: #22cfcc !important;
+        color: white;
+        text-decoration: none;
+      }
+      input:focus {
+        border: 2px solid #a1eaa1 !important;
+        box-shadow: 0 0 10px #a1eaa1 !important;
+      }
+    </style>
   </head>
   <body
     class="min-vh-100 min-vw-100 d-flex align-items-center justify-content-center m-0 p-0 box-sizing-border-box"
@@ -78,12 +100,19 @@
               >
                 Sign Up
               </button>
+              <a
+                class="btn bg-success-subtle fw-bold"
+                href="./login.html"
+                role="button"
+              >
+                Alredy Signed up ? -> Login Now</a
+              >
             </div>
           </form>
         </div>
       </div>
     </div>
-    <script src="./signup.js"></script>
+    <script src="/signup.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script
       src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"

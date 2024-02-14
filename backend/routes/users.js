@@ -1,5 +1,9 @@
-// const express = require("express");
+const express = require("express");
 
-// const router = express.Router();
+const router = express.Router();
 
-// router.get("/home");
+const userController = require("../controllers/users");
+
+router.get("/home", userController.getsignupform);
+
+module.exports = router;
