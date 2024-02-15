@@ -108,16 +108,8 @@
         <h3>Users Online:</h3>
         <ul id="userList"></ul>
       </div>
-      <div class="chat-messages">
-        <div class="message">
-          <div class="sender">~User 1</div>
-          <div class="message-content">Hello!</div>
-        </div>
-        <div class="message">
-          <div class="sender">~User 2</div>
-          <div class="message-content">Hi there!</div>
-        </div>
-        <!-- Additional messages go here -->
+      <div class="chat-messages" id="chatMessages">
+        <!-- Messages will be dynamically added here -->
       </div>
       <div class="chat-input">
         <input
@@ -129,7 +121,8 @@
         <button id="sendMessage">Send</button>
       </div>
     </div>
-    <script src="./chatwindow.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="./chatwindow.js"></script>
   </body>
 </html>
