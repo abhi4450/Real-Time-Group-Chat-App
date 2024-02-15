@@ -16,6 +16,12 @@ app.use(express.static(path.join(rootDir, "../frontend", "public")));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+const User = require("./models/User");
+const Message = require("./models/Message");
+
+User.hasMany(Message);
+Message.belongsTo(User, { constraints: true, onDelete: "CASCADE" });
+
 app.use("/api", adminRoutes);
 app.use("/api", userRoutes);
 app.use("/api", (req, res) => {

@@ -21,6 +21,7 @@ async function UserLoginHandler() {
       if (result.status === 200) {
         localStorage.setItem("token", result.data.token);
         alert(result.data.message);
+        window.location.href = "./chatwindow.html";
       } else {
         console.log("Unexpected status code:", result.status);
       }

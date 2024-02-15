@@ -2,6 +2,7 @@ const User = require("../models/User");
 
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const uuid = require("uuid");
 
 exports.signupUser = async (req, res, next) => {
   try {
@@ -69,5 +70,34 @@ exports.loginValidUser = async (req, res, next) => {
   } catch (error) {
     console.error("Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const generateUUID = () => {
+  // Generate a v4 (random) UUID
+  return uuid.v4();
+};
+
+exports.postUserMessage = async (req, res, next) => {
+  const { message } = req.body;
+  const id = generateUUID();
+
+  const UserMessage = {
+    id: id,
+    message: message,
+  };
+
+  try {
+    const userMsg = await req.user.createMessage(UserMessage);
+    res
+      .status(201)
+      .json({
+        success: true,
+        message: "Message created successfully",
+        userMsg,
+      });
+  } catch (error) {
+    console.error("Error creating message:", error);
+    res.status(500).json({ success: false, error: "Failed to create message" });
   }
 };
