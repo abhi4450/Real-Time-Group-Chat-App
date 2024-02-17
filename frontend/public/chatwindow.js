@@ -4,68 +4,49 @@ const commonHeaders = {
 
 const sendMessageButton = document.querySelector("#sendMessage");
 const messageInput = document.querySelector("#msg");
-const chatMessages = document.getElementById("chatMessages"); // Retrieve chatMessages element once
+const chatMessages = document.getElementById("chatMessages");
 
-sendMessageButton.addEventListener("click", messageHandler);
-
-async function fetchMessagesAndUpdate() {
+// Function to fetch new messages from the backend based on timestamp
+async function fetchNewMessages(timestamp) {
   try {
-    const response = await axios.get("http://localhost:3000/api/getmessages");
-    const messages = response.data;
-    displayMessages(messages);
-  } catch (error) {
-    console.error("Error fetching messages:", error);
-  }
-}
-
-setInterval(fetchMessagesAndUpdate, 1000);
-
-document.addEventListener("DOMContentLoaded", () => {
-  fetchMessagesAndUpdate();
-});
-
-async function messageHandler(e) {
-  e.preventDefault();
-
-  const message = messageInput.value;
-
-  try {
-    const result = await storeMessageToBackend(message);
-    if (result.success) {
-      console.log("Message sent successfully:", result.userMsg);
-      messageInput.value = "";
-    } else {
-      console.log("Failed to send message:", result.error);
-      // Handle the failure case
-    }
-  } catch (error) {
-    console.log("Error sending message:", error);
-  }
-}
-
-async function storeMessageToBackend(message) {
-  try {
-    const response = await axios.post(
-      "http://localhost:3000/api/user/message",
-      { message },
-      {
-        headers: commonHeaders,
-      }
+    const response = await axios.get(
+      `http://localhost:3000/api/getmessages?timestamp=${timestamp}`
     );
-
-    return response.data; // Return the response data
+    return response.data;
   } catch (error) {
-    throw new Error("Error sending message: " + error.message);
+    console.error("Error fetching new messages:", error);
+    throw new Error("Failed to fetch new messages");
   }
 }
 
+// Function to update local storage with new messages
+function updateLocalStorage(messages) {
+  try {
+    const storedMessages = JSON.parse(localStorage.getItem("messages")) || [];
+    const updatedMessages = [...storedMessages, ...messages];
+    if (updatedMessages.length > 10) {
+      updatedMessages.splice(0, updatedMessages.length - 10); // Keep only the recent 10 messages
+    }
+    localStorage.setItem("messages", JSON.stringify(updatedMessages));
+  } catch (error) {
+    console.error("Error updating local storage:", error);
+  }
+}
+
+// Function to retrieve messages from local storage
+function getMessagesFromLocalStorage() {
+  return JSON.parse(localStorage.getItem("messages")) || [];
+}
+
+// Function to display messages
 function displayMessages(messages) {
-  chatMessages.innerHTML = "";
+  chatMessages.innerHTML = ""; // Clear previous messages
   messages.forEach((message) => {
     displayMessage(message);
   });
 }
 
+// Function to create HTML elements for displaying a single message
 function displayMessage(message) {
   const div = document.createElement("div");
   div.classList.add("message");
@@ -74,4 +55,69 @@ function displayMessage(message) {
       <div class="message-content">${message.message}</div>
     `;
   chatMessages.appendChild(div);
+}
+
+// Initial fetch of messages on DOMContentLoaded
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    // Fetch messages from local storage
+    const storedMessages = getMessagesFromLocalStorage();
+    displayMessages(storedMessages);
+
+    // Fetch new messages from the backend based on timestamp
+    const latestTimestamp =
+      storedMessages.length > 0
+        ? storedMessages[storedMessages.length - 1].timestamp
+        : 0;
+    const newMessages = await fetchNewMessages(latestTimestamp);
+    updateLocalStorage(newMessages);
+    displayMessages(newMessages);
+  } catch (error) {
+    console.error("Error:", error.message);
+  }
+});
+
+// Event listener for sending messages
+sendMessageButton.addEventListener("click", async (e) => {
+  e.preventDefault();
+
+  // Validate message input
+  const message = messageInput.value.trim();
+  if (!message) {
+    console.error("Message cannot be empty");
+    return;
+  }
+
+  try {
+    // Send message to the backend
+    const result = await storeMessageToBackend(message);
+    if (result.success) {
+      console.log("Message sent successfully:", result.userMsg);
+      messageInput.value = ""; // Clear message input after sending
+
+      // Fetch and display new messages
+      const latestTimestamp = new Date().getTime();
+      const newMessages = await fetchNewMessages(latestTimestamp);
+      updateLocalStorage(newMessages);
+      displayMessages(newMessages);
+    } else {
+      console.log("Failed to send message:", result.error);
+    }
+  } catch (error) {
+    console.error("Error sending message:", error.message);
+  }
+});
+
+// Function to send a message to the backend
+async function storeMessageToBackend(message) {
+  try {
+    const response = await axios.post(
+      "http://localhost:3000/api/user/message",
+      { message },
+      { headers: commonHeaders }
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error("Error sending message: " + error.message);
+  }
 }
