@@ -10,21 +10,28 @@ exports.getsignupform = (req, res, next) => {
 
 exports.getAllMessages = async (req, res, next) => {
   try {
-    
+    // Fetch all messages from the database with associated user information
     const messages = await Message.findAll({
       include: [
         {
           model: User,
-          attributes: ["name"], 
+          attributes: ["name"],
         },
       ],
-      attributes: ["id", "message"], 
+      attributes: ["message"],
+      order: [["createdAt", "ASC"]],
+      raw: true,
     });
+    // console.log("messages", messages);
 
-    // Send the messages as a response
-    res.status(200).json(messages);
+    const transformedMessages = messages.map((message) => ({
+      message: message.message,
+      sender: message["user.name"],
+    }));
+    // console.log("transformed message", transformedMessages);
+
+    res.status(200).json(transformedMessages);
   } catch (error) {
-    // Handle errors
     console.error("Error fetching messages:", error);
     res.status(500).json({ error: "Failed to fetch messages" });
   }
