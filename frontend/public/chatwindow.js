@@ -6,11 +6,11 @@ const sendMessageButton = document.querySelector("#sendMessage");
 const messageInput = document.querySelector("#msg");
 const chatMessages = document.getElementById("chatMessages");
 
-// Function to fetch new messages from the backend based on timestamp
-async function fetchNewMessages(timestamp) {
+// Function to fetch new messages from the backend based on last message ID
+async function fetchNewMessages(lastMessageId) {
   try {
     const response = await axios.get(
-      `http://localhost:3000/api/getmessages?timestamp=${timestamp}`
+      `http://localhost:3000/api/getmessages?lastMessageId=${lastMessageId}`
     );
     return response.data;
   } catch (error) {
@@ -63,13 +63,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Fetch messages from local storage
     const storedMessages = getMessagesFromLocalStorage();
     displayMessages(storedMessages);
-
-    // Fetch new messages from the backend based on timestamp
-    const latestTimestamp =
+    const lastMessageId =
       storedMessages.length > 0
-        ? storedMessages[storedMessages.length - 1].timestamp
-        : 0;
-    const newMessages = await fetchNewMessages(latestTimestamp);
+        ? storedMessages[storedMessages.length - 1].id
+        : undefined;
+    const newMessages = await fetchNewMessages(lastMessageId);
+    if (newMessages.length === 0) return;
     updateLocalStorage(newMessages);
     displayMessages(newMessages);
   } catch (error) {
@@ -96,10 +95,14 @@ sendMessageButton.addEventListener("click", async (e) => {
       messageInput.value = ""; // Clear message input after sending
 
       // Fetch and display new messages
-      const latestTimestamp = new Date().getTime();
-      const newMessages = await fetchNewMessages(latestTimestamp);
-      updateLocalStorage(newMessages);
-      displayMessages(newMessages);
+      const storedMessages = getMessagesFromLocalStorage();
+      const lastMessageId =
+        storedMessages.length > 0
+          ? storedMessages[storedMessages.length - 1].id
+          : undefined;
+      const newMessage = await fetchNewMessages(lastMessageId);
+      updateLocalStorage(newMessage);
+      displayMessage(newMessage[0]);
     } else {
       console.log("Failed to send message:", result.error);
     }

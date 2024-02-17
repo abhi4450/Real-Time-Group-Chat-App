@@ -8,34 +8,52 @@ exports.getsignupform = (req, res, next) => {
   res.sendFile(path.join(rootDir, "../frontend", "public", "signup.html"));
 };
 
+const { Op } = require("sequelize");
+
 exports.getNewMessages = async (req, res, next) => {
   try {
-    const { timestamp } = req.query;
+    const { lastMessageId } = req.query;
+    let messages;
 
-    // Fetch new messages from the database with associated user information
-    const messages = await Message.findAll({
-      include: [
-        {
-          model: User,
-          attributes: ["name"],
+    if (lastMessageId) {
+      // Fetch messages with IDs greater than the last message ID
+      messages = await Message.findAll({
+        where: {
+          id: { [Op.gt]: lastMessageId },
         },
-      ],
-      where: {
-        createdAt: { [Op.gt]: new Date(parseInt(timestamp)) }, // Fetch messages created after the provided timestamp
-      },
-      attributes: ["message"],
-      order: [["createdAt", "ASC"]],
-      raw: true,
-    });
+        include: [
+          {
+            model: User,
+            attributes: ["name"],
+          },
+        ],
+        attributes: ["id", "message"],
+        order: [["createdAt", "ASC"]],
+        raw: true,
+      });
+    } else {
+      messages = await Message.findAll({
+        include: [
+          {
+            model: User,
+            attributes: ["name"],
+          },
+        ],
+        attributes: ["id", "message"],
+        order: [["createdAt", "ASC"]],
+        raw: true,
+      });
+    }
 
-    const transformedMessages = messages.map((message) => ({
+    messages = messages.map((message) => ({
+      id: message.id,
       message: message.message,
       sender: message["user.name"],
     }));
-
-    res.status(200).json(transformedMessages);
+    console.log("new message : ", messages);
+    res.status(200).json(messages);
   } catch (error) {
-    console.error("Error fetching new messages:", error);
-    res.status(500).json({ error: "Failed to fetch new messages" });
+    console.error("Error fetching messages:", error);
+    res.status(500).json({ error: "Failed to fetch messages" });
   }
 };
