@@ -92,3 +92,18 @@ exports.postUserMessage = async (req, res, next) => {
     res.status(500).json({ success: false, error: "Failed to create message" });
   }
 };
+
+exports.postCreateGroup = async (req, res, next) => {
+  try {
+    const { groupName } = req.body;
+
+    console.log("groupName:", groupName);
+
+    const group = await req.user.createGroup({ name: groupName });
+
+    res.status(201).json({ message: "Group created successfully", group });
+  } catch (error) {
+    console.error("Error creating group:", error);
+    res.status(500).json({ message: "Failed to create group" });
+  }
+};

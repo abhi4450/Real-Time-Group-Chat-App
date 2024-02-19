@@ -6,6 +6,13 @@ const sendMessageButton = document.querySelector("#sendMessage");
 const messageInput = document.querySelector("#msg");
 const chatMessages = document.getElementById("chatMessages");
 
+const createGroupBtn = document.querySelector("#createGroupBtn");
+const createGroupSection = document.querySelector(".create-group-section");
+const groupNameInput = document.querySelector("#groupNameInput");
+const groupList = document.getElementById("groupList");
+const cancelCreateGroupBtn = document.querySelector("#cancelCreateGroupBtn");
+const createGroup = document.querySelector("#createGroup");
+
 // Function to fetch new messages from the backend based on last message ID
 async function fetchNewMessages(lastMessageId) {
   try {
@@ -124,3 +131,80 @@ async function storeMessageToBackend(message) {
     throw new Error("Error sending message: " + error.message);
   }
 }
+
+// Event listener for creating a new group
+createGroupBtn.addEventListener("click", () => {
+  createGroupSection.style.display = "block";
+});
+// Function to save group name to local storage
+function saveGroupNameToLocalStorage(groupName) {
+  const savedGroupNames = JSON.parse(localStorage.getItem("groupNames")) || [];
+  savedGroupNames.push(groupName);
+  localStorage.setItem("groupNames", JSON.stringify(savedGroupNames));
+}
+
+// Function to load group names from local storage
+function loadGroupNamesFromLocalStorage() {
+  const savedGroupNames = JSON.parse(localStorage.getItem("groupNames")) || [];
+  return savedGroupNames;
+}
+
+// Function to display group names from local storage
+function displayGroupNamesFromLocalStorage() {
+  const savedGroupNames = loadGroupNamesFromLocalStorage();
+  savedGroupNames.forEach((groupName) => {
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    a.href = "#";
+    a.textContent = groupName;
+    li.appendChild(a);
+    groupList.appendChild(li);
+  });
+}
+
+createGroup.addEventListener("click", async () => {
+  const groupName = groupNameInput.value.trim();
+  if (!groupName) {
+    console.error("Group name cannot be empty");
+    return;
+  }
+
+  try {
+    const response = await axios.post(
+      "http://localhost:3000/api/user/createGroup",
+      { groupName },
+      { headers: commonHeaders }
+    );
+
+    if (response.status === 201) {
+      const newGroup = response.data.group;
+      console.log("New group created:", newGroup);
+
+      alert(`Group "${newGroup.name}" successfully created!`);
+
+      saveGroupNameToLocalStorage(newGroup.name);
+
+      displayGroupNamesFromLocalStorage();
+
+      createGroupSection.style.display = "none";
+
+      groupNameInput.value = "";
+    } else {
+      console.error("Failed to create group:", response.data.message);
+
+      alert("Failed to create group. Please try again.");
+    }
+  } catch (error) {
+    console.error("Error creating group:", error.message);
+
+    alert("Failed to create group. Please try again.");
+  }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  displayGroupNamesFromLocalStorage();
+});
+
+cancelCreateGroupBtn.addEventListener("click", () => {
+  createGroupSection.style.display = "none";
+});

@@ -13,4 +13,10 @@ router.post(
   adminController.postUserMessage
 );
 
+router.post(
+  "/user/createGroup",
+  userAuth.authenticate,
+  adminController.postCreateGroup
+);
+
 module.exports = router;

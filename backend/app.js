@@ -27,6 +27,9 @@ Group.hasMany(Message);
 Message.belongsTo(Group, { constraints: true, onDelete: "CASCADE" });
 User.belongsToMany(Group, { through: UserGroup });
 Group.belongsToMany(User, { through: UserGroup });
+User.hasMany(Group, { foreignKey: "adminUserId" });
+
+Group.belongsTo(User, { foreignKey: "adminUserId" });
 
 app.use("/api", adminRoutes);
 app.use("/api", userRoutes);
