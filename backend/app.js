@@ -18,9 +18,15 @@ app.use(bodyParser.json());
 
 const User = require("./models/User");
 const Message = require("./models/Message");
+const Group = require("./models/Group");
+const UserGroup = require("./models/UserGroup");
 
 User.hasMany(Message);
 Message.belongsTo(User, { constraints: true, onDelete: "CASCADE" });
+Group.hasMany(Message);
+Message.belongsTo(Group, { constraints: true, onDelete: "CASCADE" });
+User.belongsToMany(Group, { through: UserGroup });
+Group.belongsToMany(User, { through: UserGroup });
 
 app.use("/api", adminRoutes);
 app.use("/api", userRoutes);
