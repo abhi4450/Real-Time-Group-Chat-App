@@ -7,10 +7,7 @@ const Group = sequelize.define("group", {
     allowNull: false,
     unique: true,
   },
-  adminUserId: {
-    type: Sequelize.INTEGER,
-    allowNull: false,
-  },
+ 
 });
 
 module.exports = Group;

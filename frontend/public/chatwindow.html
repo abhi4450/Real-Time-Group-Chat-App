@@ -29,7 +29,7 @@
       }
 
       .sidebar {
-        width: 25%;
+        width: 30%;
         background-color: #f0f0f0;
         padding: 10px;
         border-right: 1px solid #ccc;
@@ -133,46 +133,64 @@
         padding: 8px 15px;
         border: none;
         border-radius: 5px;
-
         background-color: #16dca4;
         color: #fff;
         cursor: pointer;
       }
       .create-group-section input[type="text"] {
-        width: calc(100% - 80px);
+        width: calc(100% - 20px);
         padding: 10px;
         border: 1px solid #ccc;
         border-radius: 5px;
       }
 
-      /* Style for Join Group section */
-      #joinGroupInput {
-        width: 100%;
-        margin-right: 10px;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
+      /* Modal styles */
+      .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0, 0, 0); /* Fallback color */
+        background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
       }
 
-      #joinGroupBtn {
-        padding: 8px 15px;
-        border: none;
-        border-radius: 5px;
-        background-color: #16dca4;
-        color: #fff;
+      /* Modal content */
+      .modal-content {
+        position: relative;
+        background-color: #fefefe;
+        margin: 15% auto; /* 15% from the top and centered */
+        padding: 20px;
+        border: 1px solid #888;
+        width: 50%; /* Could be more or less, depending on screen size */
+      }
+
+      /* Close button */
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: black;
+        text-decoration: none;
         cursor: pointer;
       }
 
-      /* Style for Admin actions */
-      #makeAdminBtn,
-      #removeUserBtn {
-        padding: 8px 15px;
-        border: none;
-        border-radius: 5px;
-        background-color: #ff6961; /* Red color for remove action */
-        color: #fff;
-        cursor: pointer;
-        margin-top: 10px;
+      .highlighted {
+        background-color: #e99f9f; /* Change the background color as desired */
+      }
+
+      .delete-group-button {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
       }
 
       @media (max-width: 768px) {
@@ -222,17 +240,26 @@
   <body>
     <div class="chat-container">
       <div class="sidebar">
-        <h3>My Groups</h3>
+        <h3>All Groups</h3>
         <ul id="groupList"></ul>
+
         <button id="createGroupBtn">Create New Group</button>
-        <!-- New elements for joining group -->
-        <input
-          type="text"
-          id="joinGroupInput"
-          placeholder="Search user by name, email, or phone number"
-        />
-        <button id="joinGroupBtn">Join Group</button>
+        <div class="create-group-section">
+          <h3>Create New Group</h3>
+
+          <input
+            type="text"
+            id="groupNameInput"
+            placeholder="Enter group name"
+          />
+          <p style="margin: 15px 0">All Users:</p>
+          <div id="selectUsers" style="margin: 15px 0"></div>
+          <!-- Container for displaying users with checkboxes -->
+          <button id="createGroup">Create</button>
+          <button id="cancelCreateGroupBtn">Cancel</button>
+        </div>
       </div>
+
       <div class="main-section">
         <div class="chat-header">
           <h2>Chat App Window</h2>
@@ -247,49 +274,16 @@
           />
           <button id="sendMessage">Send</button>
         </div>
-        <!-- New elements for making admin and removing user -->
-        <button id="makeAdminBtn">Make Admin</button>
-        <button id="removeUserBtn">Remove User</button>
-      </div>
-      <div class="create-group-section">
-        <h3>Create New Group</h3>
-        <input type="text" id="groupNameInput" placeholder="Enter group name" />
-        <button id="createGroup">Create</button>
-        <button id="cancelCreateGroupBtn">Cancel</button>
       </div>
     </div>
-    <!-- <div class="chat-container">
-      <div class="sidebar">
-        <h3>My Groups</h3>
-        <ul id="groupList"></ul>
-
-        <button id="createGroupBtn">Create New Group</button>
+    <!-- Modal for displaying group members -->
+    <div id="groupMembersModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Group Members</h2>
+        <ul id="groupMembersList"></ul>
       </div>
-
-      <div class="main-section">
-        <div class="chat-header">
-          <h2>Chat App Window</h2>
-        </div>
-        <div class="chat-messages" id="chatMessages"></div>
-        <div class="chat-input">
-          <input
-            type="text"
-            placeholder="Type your message..."
-            id="msg"
-            name="message"
-          />
-          <button id="sendMessage">Send</button>
-        </div>
-      </div>
-
-      <div class="create-group-section">
-        <h3>Create New Group</h3>
-        <input type="text" id="groupNameInput" placeholder="Enter group name" />
-        <button id="createGroup">Create</button>
-        <button id="cancelCreateGroupBtn">Cancel</button>
-      </div>
-    </div> -->
-
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="./chatwindow.js"></script>
   </body>

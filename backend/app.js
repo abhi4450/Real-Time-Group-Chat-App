@@ -11,7 +11,12 @@ const sequelize = require("./util/database");
 const adminRoutes = require("./routes/admin");
 const userRoutes = require("./routes/users");
 
-app.use(cors({ origin: "*" }));
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  })
+);
 app.use(express.static(path.join(rootDir, "../frontend", "public")));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -21,15 +26,16 @@ const Message = require("./models/Message");
 const Group = require("./models/Group");
 const UserGroup = require("./models/UserGroup");
 
+User.belongsToMany(Group, { through: UserGroup });
+Group.belongsToMany(User, {
+  through: UserGroup,
+  onDelete: "CASCADE",
+});
+
 User.hasMany(Message);
-Message.belongsTo(User, { constraints: true, onDelete: "CASCADE" });
+Message.belongsTo(User);
 Group.hasMany(Message);
 Message.belongsTo(Group, { constraints: true, onDelete: "CASCADE" });
-User.belongsToMany(Group, { through: UserGroup });
-Group.belongsToMany(User, { through: UserGroup });
-User.hasMany(Group, { foreignKey: "adminUserId" });
-
-Group.belongsTo(User, { foreignKey: "adminUserId" });
 
 app.use("/api", adminRoutes);
 app.use("/api", userRoutes);

@@ -19,4 +19,10 @@ router.post(
   adminController.postCreateGroup
 );
 
+router.delete(
+  "/admin/:groupId/remove/:userId",
+  adminController.removeUserFromGroup
+);
+router.delete("/admin/delete/:groupId", adminController.deleteGroup);
+
 module.exports = router;

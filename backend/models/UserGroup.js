@@ -4,8 +4,8 @@ const sequelize = require("../util/database");
 const UserGroup = sequelize.define("userGroup", {
   id: {
     type: Sequelize.INTEGER,
-    primaryKey: true,
     allowNull: false,
+    primaryKey: true,
     autoIncrement: true,
   },
   isAdmin: {
