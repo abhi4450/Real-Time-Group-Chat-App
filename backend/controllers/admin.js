@@ -4,6 +4,7 @@ const Message = require("../models/Message");
 const UserGroup = require("../models/UserGroup");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const sequelize = require("../util/database");
 
 exports.signupUser = async (req, res, next) => {
   try {
@@ -77,7 +78,7 @@ exports.loginValidUser = async (req, res, next) => {
 exports.postUserMessage = async (req, res, next) => {
   const { groupId, message } = req.body; // Include groupId from request body
 
-  console.log("groupId----------------->", groupId);
+  // console.log("groupId----------------->", groupId);
 
   const UserMessage = {
     message: message,
@@ -86,7 +87,7 @@ exports.postUserMessage = async (req, res, next) => {
 
   try {
     const userMsg = await req.user.createMessage(UserMessage);
-    console.log("userMsg:::::::::", userMsg);
+    // console.log("userMsg:::::::::", userMsg);
     res.status(201).json({
       success: true,
       message: "Message created successfully",
@@ -140,7 +141,7 @@ exports.postCreateGroup = async (req, res, next) => {
 
 exports.removeUserFromGroup = async (req, res) => {
   const { groupId, userId } = req.params;
-  console.log("user to be removed::::::::::", userId);
+  // console.log("user to be removed::::::::::", userId);
   try {
     // Check if the user is a member of the group
     const userGroup = await UserGroup.findOne({ where: { groupId, userId } });
@@ -165,19 +166,51 @@ exports.removeUserFromGroup = async (req, res) => {
 exports.deleteGroup = async (req, res) => {
   const { groupId } = req.params;
 
+  // Start a transaction
+  const t = await sequelize.transaction();
+
   try {
     // Find the group by ID
-    const group = await Group.findByPk(groupId);
+    const group = await Group.findByPk(groupId, { transaction: t });
     if (!group) {
+      await t.rollback(); // Rollback the transaction if the group is not found
       return res.status(404).json({ message: "Group not found" });
     }
 
+    // Delete the associated messages
+    await Message.destroy({ where: { groupId }, transaction: t });
+
     // Delete the group
-    await group.destroy();
+    await group.destroy({ transaction: t });
+
+    // Commit the transaction if everything is successful
+    await t.commit();
 
     res.status(200).json({ message: "Group deleted successfully" });
   } catch (error) {
+    // Rollback the transaction if an error occurs
     console.error("Error deleting group:", error);
+    await t.rollback();
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.promoteUserToAdmin = async (req, res) => {
+  const { groupId, userId } = req.params;
+
+  try {
+    const userGroup = await UserGroup.findOne({ where: { groupId, userId } });
+    if (!userGroup) {
+      return res.status(404).json({ error: "User not found in the group" });
+    }
+
+    // Update the user's role to admin
+    userGroup.isAdmin = true;
+    await userGroup.save();
+
+    res.status(200).json({ message: "User promoted to admin successfully" });
+  } catch (error) {
+    console.error("Error promoting user to admin:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };

@@ -5,6 +5,8 @@ const app = express();
 const path = require("path");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const http = require("http").createServer(app);
+const io = require("socket.io")(http);
 
 const rootDir = require("./util/path");
 const sequelize = require("./util/database");
@@ -43,11 +45,23 @@ app.use("/api", (req, res) => {
   res.sendFile(path.join(rootDir, "../frontend", `/public/${req.url}`));
 });
 
+io.on("connection", (socket) => {
+  console.log(`A user connected with socket id ${socket.id}`);
+  socket.on("send-message", (message) => {
+    socket.broadcast.emit("receive-message", message);
+    console.log(message);
+  });
+  // socket.on("join-room", (currentGroupId) => {
+  //   console.log("joined group");
+  //   socket.broadcast.emit("show-message", currentGroupId);
+  // });
+});
+
 sequelize
   .sync()
   .then(() => {
-    app.listen(3000, (req, res) => {
-      console.log("server running on Port=3000");
+    http.listen(3000, () => {
+      console.log("Server running on Port:3000");
     });
   })
-  .catch((err) => console.log(err));
+  .catch((err) => console.error("Error syncing database:", err));

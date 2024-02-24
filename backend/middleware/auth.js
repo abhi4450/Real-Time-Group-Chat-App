@@ -6,7 +6,7 @@ const authenticateGroupAdmin = async (req, res, next) => {
   const jwtSecret = process.env.JWT_SECRET;
   try {
     const token = req.header("Authorization");
-    console.log("Received token:", token);
+    // console.log("Received token:", token);
     const decodedToken = jwt.verify(token, jwtSecret);
     const userId = decodedToken.userId;
 
@@ -31,11 +31,11 @@ const authenticateGroupAdmin = async (req, res, next) => {
       id: userId,
       isAdmin: userGroup.isAdmin,
     };
-    console.log(
-      "req.user.id,req.user.isAdmin::",
-      req.user.id,
-      req.user.isAdmin
-    );
+    // console.log(
+    //   "req.user.id,req.user.isAdmin::",
+    //   req.user.id,
+    //   req.user.isAdmin
+    // );
     next();
   } catch (error) {
     console.error("Error authenticating user:", error);
@@ -52,9 +52,9 @@ const authenticate = (req, res, next) => {
   const jwtSecret = process.env.JWT_SECRET;
   try {
     const token = req.header("Authorization");
-    console.log("recieved token :", token);
+    // console.log("recieved token :", token);
     const user = jwt.verify(token, jwtSecret);
-    console.log("userId >>>>>>>>>>>>>>>>>", user.userId);
+    // console.log("userId >>>>>>>>>>>>>>>>>", user.userId);
     User.findByPk(user.userId).then((user) => {
       req.user = user;
       next();

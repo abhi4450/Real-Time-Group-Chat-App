@@ -14,6 +14,15 @@ const cancelCreateGroupBtn = document.querySelector("#cancelCreateGroupBtn");
 const createGroup = document.querySelector("#createGroup");
 
 let currentGroupId = null; // Initialize currentGroupId to null initially
+const socket = io("http://localhost:3000");
+socket.on("connect", () => {
+  console.log("connected to server");
+});
+
+socket.on("receive-message", (message) => {
+  console.log(message[0]);
+ displayMessage(message[0]);
+});
 
 async function fetchGroupsForUser() {
   try {
@@ -22,7 +31,7 @@ async function fetchGroupsForUser() {
       headers: commonHeaders,
     });
     if (response.status === 200) {
-      console.log("Groups fetched successfully");
+      // console.log("Groups fetched successfully");
       // Process the fetched groups, such as displaying them on the UI
       return response.data.groups;
     }
@@ -32,7 +41,7 @@ async function fetchGroupsForUser() {
   }
 }
 
-console.log("present group id::", currentGroupId);
+// console.log("present group id::", currentGroupId);
 // Function to fetch new messages from the backend based on last message ID
 async function fetchNewMessages(groupId, lastMessageId) {
   try {
@@ -53,7 +62,7 @@ function updateLocalStorage(messages) {
 
     const updatedMessages = [...storedMessages, ...messages];
     if (updatedMessages.length > 1000) {
-      updatedMessages.splice(0, updatedMessages.length - 10); // Keep only the recent 1000 messages
+      updatedMessages.splice(0, updatedMessages.length - 1000);
     }
     localStorage.setItem("messages", JSON.stringify(updatedMessages));
   } catch (error) {
@@ -98,20 +107,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     // displayGroupNamesFromLocalStorage();
     const groups = await fetchGroupsForUser();
-    console.log("fetched groups", groups);
+    // console.log("fetched groups", groups);
     displayGroupNames(groups);
 
     // Check if there's a stored currentGroupId in localStorage
     const storedGroupId = JSON.parse(localStorage.getItem("currentGroupId"));
-    console.log("storedGroupId", storedGroupId);
+    // console.log("storedGroupId", storedGroupId);
     if (storedGroupId) {
       // Set the currentGroupId from localStorage
       currentGroupId = storedGroupId;
-      console.log("updatedCurrentGroupId:", currentGroupId);
+      // console.log("updatedCurrentGroupId:", currentGroupId);
       const savedGroupItem = document.querySelector(
         `#groupList li[data-group-id="${storedGroupId}"]`
       );
-      console.log("savedGroupItem:::", savedGroupItem);
+      // console.log("savedGroupItem:::", savedGroupItem);
       if (savedGroupItem) {
         // Remove highlight from all group items
         document.querySelectorAll("#groupList li").forEach((groupItem) => {
@@ -143,20 +152,28 @@ sendMessageButton.addEventListener("click", async (e) => {
   // Validate message input
   const message = messageInput.value.trim();
   if (!message) {
-    console.error("Message cannot be empty");
+    alert("Message cannot be empty");
     return;
   }
 
   try {
     // Send message to the backend
+
     const result = await storeMessageToBackend(currentGroupId, message);
     if (result.success) {
-      console.log("Message sent successfully:", result.userMsg);
+      console.log(result.userMsg);
+      // Emit the send-message event to notify other users
+      // socket.emit("send-message", {
+      //   groupId: currentGroupId,
+      //   message: message,
+      // });
+
       messageInput.value = ""; // Clear message input after sending
 
       // Fetch and display new messages
       const lastMessageId = getLastMessageIdForGroup(currentGroupId);
       const newMessage = await fetchNewMessages(currentGroupId, lastMessageId);
+      socket.emit("send-message", newMessage);
       updateLocalStorage(newMessage);
       displayMessagesByGroupId(currentGroupId);
     } else {
@@ -233,10 +250,11 @@ function displayGroupName(groupName) {
 
     // Set the current group ID
     currentGroupId = li.dataset.groupId;
+    // socket.emit("join-room", currentGroupId);
 
     localStorage.setItem("currentGroupId", JSON.stringify(currentGroupId));
 
-    console.log("currentGroupId:", currentGroupId);
+    // console.log("currentGroupId:", currentGroupId);
 
     // Call function to fetch and display group messages
     const lastMessageId = getLastMessageIdForGroup(currentGroupId);
@@ -244,6 +262,8 @@ function displayGroupName(groupName) {
     updateLocalStorage(newMessages);
     displayMessagesByGroupId(currentGroupId);
     displayGroupMembers(currentGroupId);
+    // // Emit the "joinGroup" event when a user clicks on a group
+    // socket.emit("joinGroup", currentGroupId);
   });
 }
 
@@ -261,7 +281,7 @@ createGroup.addEventListener("click", async () => {
     .forEach((checkbox) => {
       selectedUsers.push(checkbox.value);
     });
-  console.log("Selected Users:", selectedUsers);
+  // console.log("Selected Users:", selectedUsers);
   if (selectedUsers.length === 0) {
     console.error("Please select at least one user to create a group");
     return;
@@ -277,7 +297,7 @@ createGroup.addEventListener("click", async () => {
     if (response.status === 201) {
       const newGroup = response.data.group;
 
-      console.log("New group created:", newGroup);
+      // console.log("New group created:", newGroup);
 
       alert(`Group "${newGroup.name}" successfully created!`);
 
@@ -307,7 +327,7 @@ async function fetchUsersForGroups() {
   try {
     const response = await axios.get("http://localhost:3000/api/users");
     if (response.status === 200) {
-      console.log("Users fetched successfully");
+      // console.log("Users fetched successfully");
       showUsers(response.data.users);
     }
   } catch (error) {
@@ -321,7 +341,7 @@ function showUsers(users) {
   // Clear previous content
   selectUsersContainer.innerHTML = "";
 
-  console.log(users);
+  // console.log(users);
   users.forEach((user) => {
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
@@ -356,8 +376,8 @@ async function displayGroupMembers(groupId) {
 
     const isCurrentUserAdmin = response.data.isCurrentUserAdmin;
 
-    console.log("groupMembers--------->", groupMembers);
-    console.log("isCurrentUserAdmin--------->", isCurrentUserAdmin);
+    // console.log("groupMembers--------->", groupMembers);
+    // console.log("isCurrentUserAdmin--------->", isCurrentUserAdmin);
 
     // Populate the modal with group members
     const groupMembersList = document.getElementById("groupMembersList");
@@ -383,7 +403,7 @@ async function displayGroupMembers(groupId) {
 
             // Check if the removal was successful
             if (response.status === 200) {
-              console.log(response.data.message);
+              // console.log(response.data.message);
               // Optionally, you can update the UI to reflect the removal, such as removing the user from the list
               listItem.remove();
             } else {
@@ -399,6 +419,34 @@ async function displayGroupMembers(groupId) {
           // console.log("Remove button clicked for member:", member.id);
         });
         listItem.appendChild(removeButton);
+
+        // Create the "Promote to Admin" button
+        const promoteButton = document.createElement("button");
+        promoteButton.textContent = "Promote to Admin";
+        promoteButton.style.marginLeft = "4px";
+        promoteButton.addEventListener("click", async () => {
+          // Add logic to promote the member to an admin of the group
+          try {
+            // Make an Axios request to the backend to promote the user within the group
+            const response = await axios.patch(
+              `/api/admin/${groupId}/promote/${member.id}`
+            );
+
+            // Check if the promotion was successful
+            if (response.status === 200) {
+              // console.log(response.data.message);
+              closeModal();
+            } else {
+              console.error(
+                "Failed to promote user to admin:",
+                response.data.message
+              );
+            }
+          } catch (error) {
+            console.error("Error promoting user to admin:", error);
+          }
+        });
+        listItem.appendChild(promoteButton);
       }
 
       groupMembersList.appendChild(listItem);
@@ -410,10 +458,9 @@ async function displayGroupMembers(groupId) {
       deleteGroupButton.textContent = "Delete Group";
       deleteGroupButton.classList.add("delete-group-button");
       deleteGroupButton.addEventListener("click", async () => {
-        // Add logic to delete the group
         try {
           const response = await axios.delete(`/api/admin/delete/${groupId}`);
-          console.log(response.data.message);
+          // console.log(response.data.message);
           // Remove the group from UI and local storage
           const groupListItem = document.querySelector(
             `li[data-group-id="${groupId}"]`

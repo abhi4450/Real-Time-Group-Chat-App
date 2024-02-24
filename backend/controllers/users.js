@@ -45,7 +45,7 @@ exports.getNewMessages = async (req, res, next) => {
       sender: message["user.name"],
       groupId: groupId,
     }));
-    console.log("new message:;;;;;;;;;;;;;", messages);
+    // console.log("new message:;;;;;;;;;;;;;", messages);
     res.status(200).json(messages);
   } catch (error) {
     console.error("Error fetching messages:", error);
@@ -84,7 +84,7 @@ exports.getGroupMembers = async (req, res) => {
 
     // Check if the group exists
     if (!group) {
-      console.log(`Group with ID ${groupId} not found`);
+      // console.log(`Group with ID ${groupId} not found`);
       return res.status(404).json({ message: "Group not found" });
     }
 
@@ -97,7 +97,7 @@ exports.getGroupMembers = async (req, res) => {
 
       groupId: groupId,
     }));
-    console.log("req.user.isAdmin::::::::::", req.user.isAdmin);
+    // console.log("req.user.isAdmin::::::::::", req.user.isAdmin);
     return res
       .status(200)
       .json({ members, isCurrentUserAdmin: req.user.isAdmin });
@@ -110,7 +110,7 @@ exports.getGroupMembers = async (req, res) => {
 exports.fetchUserGroups = async (req, res) => {
   try {
     // Find group IDs associated with the logged-in user
-    console.log("req.user>>>>>>>>", req.user.id);
+    // console.log("req.user>>>>>>>>", req.user.id);
     const userGroups = await UserGroup.findAll({
       where: { userId: req.user.id },
       attributes: ["groupId"], // Only select the group IDs

@@ -23,6 +23,10 @@ router.delete(
   "/admin/:groupId/remove/:userId",
   adminController.removeUserFromGroup
 );
+router.patch(
+  "/admin/:groupId/promote/:userId",
+  adminController.promoteUserToAdmin
+);
 router.delete("/admin/delete/:groupId", adminController.deleteGroup);
 
 module.exports = router;

@@ -10,6 +10,7 @@ const host = process.env.DB_HOST;
 const sequelize = new Sequelize(database, username, password, {
   dialect: "mysql",
   host: host,
+  logging: false, // Disable logging of SQL commands
 });
 
 module.exports = sequelize;
